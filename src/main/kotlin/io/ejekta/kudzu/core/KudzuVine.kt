@@ -1,8 +1,5 @@
 package io.ejekta.kudzu.core
 
-import io.ejekta.kudzu.value.KudzuLeafInt
-import io.ejekta.kudzu.value.KudzuLeafNull
-import io.ejekta.kudzu.value.KudzuLeafString
 import io.ejekta.kudzu.value.KudzuLeaf
 
 class KudzuVine(
@@ -10,15 +7,15 @@ class KudzuVine(
 ) : KudzuItem, MutableMap<String, KudzuItem> by content {
 
     fun leaf(key: String, value: Int) {
-        this[key] = KudzuLeafInt(value)
+        this[key] = KudzuLeaf.LeafInt(value)
     }
 
     fun leaf(key: String, value: String) {
-        this[key] = KudzuLeafString(value)
+        this[key] = KudzuLeaf.LeafString(value)
     }
 
     fun leaf(key: String, value: Nothing? = null) {
-        this[key] = KudzuLeafNull()
+        this[key] = KudzuLeaf.LeafNull
     }
 
     fun trim(vararg keys: String) = trim(keys.toList())

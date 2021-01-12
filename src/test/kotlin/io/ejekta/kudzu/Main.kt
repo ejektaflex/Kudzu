@@ -1,8 +1,9 @@
+package io.ejekta.kudzu
+
 import io.ejekta.kudzu.core.KudzuVine
 import io.ejekta.kudzu.ext.toJsonObject
 import io.ejekta.kudzu.ext.toKudzu
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.encodeToString
+import io.ejekta.kudzu.value.KudzuLeaf
 import kotlinx.serialization.json.*
 import kotlinx.serialization.json.JsonObject
 
@@ -58,10 +59,13 @@ fun main() {
 
     val j = myObj.toJsonObject()
 
+
+
     println(j)
 
     val k = j.toKudzu()
     println(k.keys)
+    
 
 
 

@@ -2,9 +2,6 @@ package io.ejekta.kudzu.ext
 
 import io.ejekta.kudzu.core.KudzuVine
 import io.ejekta.kudzu.value.KudzuLeaf
-import io.ejekta.kudzu.value.KudzuLeafInt
-import io.ejekta.kudzu.value.KudzuLeafNull
-import io.ejekta.kudzu.value.KudzuLeafString
 import kotlinx.serialization.json.*
 
 // ### JsonObject -> Kudzu
@@ -12,7 +9,7 @@ import kotlinx.serialization.json.*
 fun JsonObject.toKudzu(): KudzuVine {
     return KudzuVine(toMap().map { (key, element) ->
         key to when (element) {
-            is JsonNull -> KudzuLeafNull()
+            is JsonNull -> KudzuLeaf.LeafNull
             is JsonObject -> element.toKudzu()
             is JsonPrimitive -> element.toKudzu()
             else -> throw Exception("Something else shows in JsonObject map when exporting!")
@@ -22,8 +19,8 @@ fun JsonObject.toKudzu(): KudzuVine {
 
 fun JsonPrimitive.toKudzu(): KudzuLeaf<*> {
     return when {
-        isString -> KudzuLeafString(content)
-        intOrNull != null -> KudzuLeafInt(int)
+        isString -> KudzuLeaf.LeafString(content)
+        intOrNull != null -> KudzuLeaf.LeafInt(int)
         else -> throw Exception("Can't parse JsonPrimitive type to Kudzu! It's raw content is: '$content'")
     }
 }
@@ -42,9 +39,9 @@ fun KudzuVine.toJsonObject(): JsonObject {
 
 fun KudzuLeaf<*>.toJsonElement(): JsonElement {
     return when (this) {
-        is KudzuLeafInt -> JsonPrimitive(content)
-        is KudzuLeafNull -> JsonNull
-        is KudzuLeafString -> JsonPrimitive(content)
+        is KudzuLeaf.LeafInt -> JsonPrimitive(content)
+        is KudzuLeaf.LeafNull -> JsonNull
+        is KudzuLeaf.LeafString -> JsonPrimitive(content)
         else -> throw Exception("Could not turn KudzuLeaf into a JsonElement!")
     }
 }
