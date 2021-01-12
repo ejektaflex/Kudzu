@@ -1,7 +1,6 @@
-package io.ejekta.kudzu.core
+package io.ejekta.kudzu
 
-import io.ejekta.kudzu.value.KudzuLeaf
-
+@KudzuMarker
 class KudzuVine(
     val content: MutableMap<String, KudzuItem> = mutableMapOf()
 ) : KudzuItem, MutableMap<String, KudzuItem> by content {

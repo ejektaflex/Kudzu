@@ -1,9 +1,5 @@
 package io.ejekta.kudzu
 
-import io.ejekta.kudzu.core.KudzuVine
-import io.ejekta.kudzu.ext.toJsonObject
-import io.ejekta.kudzu.ext.toKudzu
-import io.ejekta.kudzu.value.KudzuLeaf
 import kotlinx.serialization.json.*
 import kotlinx.serialization.json.JsonObject
 
@@ -29,9 +25,9 @@ fun main() {
 
     println(b)
 
-    val v: KudzuVine
+    var v: KudzuVine
 
-    val myObj = KudzuVine().apply {
+    val myObj = kudzu {
         leaf("a", 1)
         leaf("b", 4)
         vine("c") {
@@ -45,7 +41,7 @@ fun main() {
         }
     }
 
-    val myOtherObj = KudzuVine().apply {
+    val myOtherObj = kudzu {
         vine("c") {
             leaf("weight", 150)
         }
@@ -55,17 +51,7 @@ fun main() {
     }
 
 
-    myObj.graft(myOtherObj)
 
-    val j = myObj.toJsonObject()
-
-
-
-    println(j)
-
-    val k = j.toKudzu()
-    println(k.keys)
-    
 
 
 

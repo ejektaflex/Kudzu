@@ -1,7 +1,7 @@
 package io.ejekta.kudzu.ext
 
-import io.ejekta.kudzu.core.KudzuVine
-import io.ejekta.kudzu.value.KudzuLeaf
+import io.ejekta.kudzu.KudzuVine
+import io.ejekta.kudzu.KudzuLeaf
 import kotlinx.serialization.json.*
 
 // ### JsonObject -> Kudzu
