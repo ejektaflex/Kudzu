@@ -18,7 +18,9 @@ fun JsonObject.toKudzu(): KudzuVine {
 fun JsonPrimitive.toKudzu(): KudzuLeaf<*> {
     return when {
         isString -> KudzuLeaf.LeafString(content)
+        booleanOrNull != null -> KudzuLeaf.LeafBool(boolean)
         intOrNull != null -> KudzuLeaf.LeafInt(int)
+        doubleOrNull != null -> KudzuLeaf.LeafDouble(double)
         else -> throw Exception("Can't parse JsonPrimitive type to Kudzu! It's raw content is: '$content'")
     }
 }
@@ -40,6 +42,7 @@ fun KudzuLeaf<*>.toJsonElement(): JsonElement {
         is KudzuLeaf.LeafInt -> JsonPrimitive(content)
         is KudzuLeaf.LeafNull -> JsonNull
         is KudzuLeaf.LeafString -> JsonPrimitive(content)
-        else -> throw Exception("Could not turn KudzuLeaf into a JsonElement!")
+        is KudzuLeaf.LeafBool -> JsonPrimitive(content)
+        is KudzuLeaf.LeafDouble -> JsonPrimitive(content)
     }
 }
