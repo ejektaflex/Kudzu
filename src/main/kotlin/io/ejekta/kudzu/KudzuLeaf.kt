@@ -1,8 +1,17 @@
 package io.ejekta.kudzu
 
-sealed class KudzuLeaf<T>(var content: T) : KudzuItem {
-    override fun toString(): String {
-        return content.toString()
+sealed class KudzuLeaf<T>(val content: T) : KudzuItem {
+
+    override fun toString() = content.toString()
+
+    fun clone(): KudzuLeaf<*> {
+        return when(this) {
+            is LeafDouble -> LeafDouble(content)
+            is LeafInt -> LeafInt(content)
+            is LeafString -> LeafString(content)
+            is LeafBool -> LeafBool(content)
+            is LeafNull -> LeafNull
+        }
     }
 
     class LeafInt(num: Int) : KudzuLeaf<Int>(num)
@@ -11,9 +20,8 @@ sealed class KudzuLeaf<T>(var content: T) : KudzuItem {
 
     class LeafDouble(double: Double) : KudzuLeaf<Double>(double)
 
-    class LeafBool(boolean: Boolean) : KudzuLeaf<Boolean>(boolean)
+    class LeafBool(bool: Boolean) : KudzuLeaf<Boolean>(bool)
 
     object LeafNull : KudzuLeaf<Nothing?>(null)
-
 
 }

@@ -27,29 +27,25 @@ fun main() {
 
     var v: KudzuVine
 
-    val myObj = kudzu {
-        leaf("a", 1)
-        leaf("b", 4)
-        vine("c") {
-            leaf("name", "Bob")
-            leaf("age", 30)
-        }
-        v = vine("d", "colors") {
-            leaf("red", 0)
-            leaf("orange", 1)
-            leaf("yellow", 2)
+    val vehicleProto = kudzu {
+        leaf("type")
+    }
+
+    val carProto = kudzu {
+        leaf("color", "red")
+        vine("body") {
+            leaf("wheels", 4)
         }
     }
 
-    val myOtherObj = kudzu {
-        vine("c") {
-            leaf("weight", 150)
-        }
-        vine("d") {
-            leaf("test")
+    val semi = vehicleProto.clone {
+        vine("body") {
+            leaf("wheels", 18)
         }
     }
 
+    println(vehicleProto.toJsonObject())
+    println(semi.toJsonObject())
 
 
 

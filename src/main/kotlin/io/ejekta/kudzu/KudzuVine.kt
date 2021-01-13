@@ -5,6 +5,20 @@ class KudzuVine(
     val content: MutableMap<String, KudzuItem> = mutableMapOf()
 ) : KudzuItem, MutableMap<String, KudzuItem> by content {
 
+    @KudzuMarker
+    operator fun invoke(func: KudzuVine.() -> Unit) = apply(func)
+
+    fun clone(func: KudzuVine.() -> Unit = {}): KudzuVine {
+        return KudzuVine(content.map {
+            it.key to when(val item = it.value) {
+                is KudzuVine -> item.clone()
+                is KudzuLeaf<*> -> item.clone()
+                else -> throw Exception("Cannot clone Kudzu item: $item")
+            }
+        }.toMap().toMutableMap()).apply(func)
+        //return KudzuVine(content.toMutableMap()).apply(func)
+    }
+
     fun leaf(key: String, value: Int) {
         this[key] = KudzuLeaf.LeafInt(value)
     }
