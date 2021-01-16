@@ -43,7 +43,7 @@ class KudzuVine(
         if (index.isEmpty()) {
             throw Exception("KudzuVine::trim received an empty list of arguments!")
         }
-        val targetVine = query(index.drop(1))
+        val targetVine = stem(index.drop(1))
         return targetVine.remove(index[0]) ?: throw Exception("Key did not exist in Vine!: ${index[0]}")
     }
 
@@ -60,28 +60,28 @@ class KudzuVine(
         return oldVine.vine(index.drop(1))
     }
 
-    fun query(vararg index: String) = query(index.toList())
+    fun stem(vararg index: String) = stem(index.toList())
 
-    fun query(vararg index: String, queryFunc: KudzuVine.() -> Unit): KudzuVine {
-        return query(*index).apply(queryFunc)
+    fun stem(vararg index: String, queryFunc: KudzuVine.() -> Unit): KudzuVine {
+        return stem(*index).apply(queryFunc)
     }
 
-    fun query(index: List<String>): KudzuVine {
+    fun stem(index: List<String>): KudzuVine {
         val key = index.firstOrNull() ?: return this
         val gotVine = this[key] as? KudzuVine ?: throw Exception("Key is not a vine!: $index")
-        return gotVine.query(index.drop(1))
+        return gotVine.stem(index.drop(1))
     }
 
-    fun queryOrNull(vararg index: String) = queryOrNull(index.toList())
+    fun safeStem(vararg index: String) = safeStem(index.toList())
 
-    fun queryOrNull(vararg index: String, queryFunc: KudzuVine.() -> Unit): KudzuVine? {
-        return queryOrNull(*index)?.apply(queryFunc)
+    fun safeStem(vararg index: String, queryFunc: KudzuVine.() -> Unit): KudzuVine? {
+        return safeStem(*index)?.apply(queryFunc)
     }
 
-    fun queryOrNull(index: List<String>): KudzuVine? {
+    fun safeStem(index: List<String>): KudzuVine? {
         val key = index.firstOrNull() ?: return this
         val gotVine = this[key] as? KudzuVine
-        return gotVine?.queryOrNull(index.drop(1))
+        return gotVine?.safeStem(index.drop(1))
     }
 
     fun graft(other: KudzuVine) {
@@ -97,13 +97,13 @@ class KudzuVine(
 
     fun growIsNull(vararg index: String): Boolean {
         val key = index.firstOrNull() ?: return false
-        val root = query(index.dropLast(1).toList())
+        val root = stem(index.dropLast(1).toList())
         val item = root[index.last()]!!.asLeaf()
         return item is KudzuLeaf.LeafNull
     }
 
     private fun <T : Any?> growLeafOrNull(keys: List<String>): T? {
-        val item = query(keys.dropLast(1))[keys.last()]!!
+        val item = stem(keys.dropLast(1))[keys.last()]!!
         if (item is KudzuLeaf.LeafNull) return null
         val leaf = item as? KudzuLeaf<*>
             ?: throw Exception("$keys does not lead to a leaf!")
