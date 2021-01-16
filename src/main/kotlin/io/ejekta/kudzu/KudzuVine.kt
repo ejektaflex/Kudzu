@@ -1,5 +1,7 @@
 package io.ejekta.kudzu
 
+import java.lang.NullPointerException
+
 @KudzuMarker
 class KudzuVine(
     val content: MutableMap<String, KudzuItem> = mutableMapOf()
@@ -19,6 +21,7 @@ class KudzuVine(
         //return KudzuVine(content.toMutableMap()).apply(func)
     }
 
+
     fun leaf(key: String, value: Int) {
         this[key] = KudzuLeaf.LeafInt(value)
     }
@@ -31,27 +34,39 @@ class KudzuVine(
         this[key] = KudzuLeaf.LeafNull
     }
 
-    fun trim(vararg keys: String) = trim(keys.toList())
+    fun trim(vararg index: String) = trim(index.toList())
 
-    fun trim(keys: List<String>): KudzuItem {
-        if (keys.isEmpty()) {
+    fun trim(index: List<String>): KudzuItem {
+        if (index.isEmpty()) {
             throw Exception("KudzuVine::trim received an empty list of arguments!")
         }
-        val targetVine = vine(keys.drop(1))
-        return targetVine.remove(keys[0]) ?: throw Exception("Key did not exist in Vine!: ${keys[0]}")
+        val targetVine = query(index.drop(1))
+        return targetVine.remove(index[0]) ?: throw Exception("Key did not exist in Vine!: ${index[0]}")
     }
 
-    fun vine(vararg keys: String) = vine(keys.toList())
+    fun vine(vararg index: String) = vine(index.toList())
 
-    fun vine(vararg keys: String, vineFunc: KudzuVine.() -> Unit): KudzuVine {
-        return vine(*keys).apply(vineFunc)
+    fun vine(vararg index: String, vineFunc: KudzuVine.() -> Unit): KudzuVine {
+        return vine(*index).apply(vineFunc)
     }
 
-    fun vine(keys: List<String>): KudzuVine {
-        val key = keys.firstOrNull() ?: return this
+    fun vine(index: List<String>): KudzuVine {
+        val key = index.firstOrNull() ?: return this
         val oldVine = this[key] as? KudzuVine ?: KudzuVine()
         this[key] = oldVine
-        return oldVine.vine(keys.drop(1))
+        return oldVine.vine(index.drop(1))
+    }
+
+    fun query(vararg index: String) = query(index.toList())
+
+    fun query(vararg index: String, queryFunc: KudzuVine.() -> Unit): KudzuVine {
+        return query(*index).apply(queryFunc)
+    }
+
+    fun query(index: List<String>): KudzuVine {
+        val key = index.firstOrNull() ?: return this
+        val gotVine = this[key] as? KudzuVine ?: throw Exception("Key is not a vine!: $index")
+        return gotVine.query(index.drop(1))
     }
 
     fun graft(other: KudzuVine) {
@@ -65,6 +80,42 @@ class KudzuVine(
         }
     }
 
+    fun growIsNull(vararg index: String): Boolean {
+        val key = index.firstOrNull() ?: return false
+        val root = query(index.dropLast(1).toList())
+        val item = root[index.last()]!!.asLeaf()
+        return item is KudzuLeaf.LeafNull
+    }
 
+    private fun <T : Any?> growLeafOrNull(keys: List<String>): T? {
+        val item = query(keys.dropLast(1))[keys.last()]!!
+        if (item is KudzuLeaf.LeafNull) return null
+        val leaf = item as? KudzuLeaf<*>
+            ?: throw Exception("$keys does not lead to a leaf!")
+        return leaf.content as T?
+    }
+
+    private fun <T : Any> growLeaf(keys: List<String>): T =
+        growLeafOrNull(keys) ?: throw NullPointerException("Leaf not found in vine! Path: $keys")
+
+    fun growInt(vararg keys: String): Int = growInt(keys.toList())
+    fun growInt(keys: List<String>): Int = growLeaf(keys)
+    fun growIntOrNull(vararg keys: String): Int? = growIntOrNull(keys.toList())
+    fun growIntOrNull(keys: List<String>): Int? = growLeafOrNull(keys)
+
+    fun growString(vararg keys: String): String = growString(keys.toList())
+    fun growString(keys: List<String>): String = growLeaf(keys)
+    fun growStringOrNull(vararg keys: String): String? = growStringOrNull(keys.toList())
+    fun growStringOrNull(keys: List<String>): String? = growLeafOrNull(keys)
+
+    fun growBool(vararg keys: String): Boolean = growBool(keys.toList())
+    fun growBool(keys: List<String>): Boolean = growLeaf(keys)
+    fun growBoolOrNull(vararg keys: String): Boolean? = growBoolOrNull(keys.toList())
+    fun growBoolOrNull(keys: List<String>): Boolean? = growLeafOrNull(keys)
+
+    fun growDouble(vararg keys: String): Double = growDouble(keys.toList())
+    fun growDouble(keys: List<String>): Double = growLeaf(keys)
+    fun growDoubleOrNull(vararg keys: String): Double? = growDoubleOrNull(keys.toList())
+    fun growDoubleOrNull(keys: List<String>): Double? = growLeafOrNull(keys)
 
 }
