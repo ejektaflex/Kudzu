@@ -21,6 +21,9 @@ class KudzuVine(
         //return KudzuVine(content.toMutableMap()).apply(func)
     }
 
+    override fun toString(): String {
+        return toJsonObject().toString()
+    }
 
     fun leaf(key: String, value: Int) {
         this[key] = KudzuLeaf.LeafInt(value)
@@ -67,6 +70,18 @@ class KudzuVine(
         val key = index.firstOrNull() ?: return this
         val gotVine = this[key] as? KudzuVine ?: throw Exception("Key is not a vine!: $index")
         return gotVine.query(index.drop(1))
+    }
+
+    fun queryOrNull(vararg index: String) = queryOrNull(index.toList())
+
+    fun queryOrNull(vararg index: String, queryFunc: KudzuVine.() -> Unit): KudzuVine? {
+        return queryOrNull(*index)?.apply(queryFunc)
+    }
+
+    fun queryOrNull(index: List<String>): KudzuVine? {
+        val key = index.firstOrNull() ?: return this
+        val gotVine = this[key] as? KudzuVine
+        return gotVine?.queryOrNull(index.drop(1))
     }
 
     fun graft(other: KudzuVine) {
