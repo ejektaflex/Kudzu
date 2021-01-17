@@ -25,12 +25,36 @@ class KudzuVine(
         return toJsonObject().toString()
     }
 
-    fun leaf(key: String, value: Int) {
-        this[key] = KudzuLeaf.LeafInt(value)
+    fun leaf(key: String, value: Int?) {
+        this[key] = if (value != null) {
+            KudzuLeaf.LeafInt(value)
+        } else {
+            KudzuLeaf.LeafNull
+        }
     }
 
-    fun leaf(key: String, value: String) {
-        this[key] = KudzuLeaf.LeafString(value)
+    fun leaf(key: String, value: String?) {
+        this[key] = if (value != null) {
+            KudzuLeaf.LeafString(value)
+        } else {
+            KudzuLeaf.LeafNull
+        }
+    }
+
+    fun leaf(key: String, value: Boolean?) {
+        this[key] = if (value != null) {
+            KudzuLeaf.LeafBool(value)
+        } else {
+            KudzuLeaf.LeafNull
+        }
+    }
+
+    fun leaf(key: String, value: Double?) {
+        this[key] = if (value != null) {
+            KudzuLeaf.LeafDouble(value)
+        } else {
+            KudzuLeaf.LeafNull
+        }
     }
 
     fun leaf(key: String, value: Nothing? = null) {
