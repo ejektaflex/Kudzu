@@ -4,15 +4,22 @@ import kotlinx.serialization.json.*
 
 // ### JsonObject -> Kudzu
 
+fun JsonElement.toKudzu(): KudzuItem {
+    return when (this) {
+        is JsonNull -> KudzuLeaf.LeafNull
+        is JsonObject -> toKudzu()
+        is JsonArray -> toKudzu()
+        is JsonPrimitive -> toKudzu()
+        else -> throw Exception("Something else shows in ${this::class.simpleName} when exporting!")
+    }
+}
+
 fun JsonObject.toKudzu(): KudzuVine {
-    return KudzuVine(toMap().map { (key, element) ->
-        key to when (element) {
-            is JsonNull -> KudzuLeaf.LeafNull
-            is JsonObject -> element.toKudzu()
-            is JsonPrimitive -> element.toKudzu()
-            else -> throw Exception("Something else shows in JsonObject map when exporting!")
-        }
-    }.toMap().toMutableMap())
+    return KudzuVine(map { it.key to it.value.toKudzu() }.toMap().toMutableMap())
+}
+
+fun JsonArray.toKudzu(): KudzuLattice {
+    return KudzuLattice(map { it.toKudzu() }.toMutableList())
 }
 
 fun JsonPrimitive.toKudzu(): KudzuLeaf<*> {
@@ -27,14 +34,23 @@ fun JsonPrimitive.toKudzu(): KudzuLeaf<*> {
 
 // ### Kudzu -> JsonObject
 
+fun KudzuItem.toJsonElement(): JsonElement {
+    return when (this) {
+        is KudzuLeaf<*> -> toJsonElement()
+        is KudzuVine -> toJsonObject()
+        is KudzuLattice -> toJsonArray()
+        else -> throw Exception("Kudzu Item not exportable!")
+    }
+}
+
 fun KudzuVine.toJsonObject(): JsonObject {
     return JsonObject(content.map {
-        it.key to when(val item = it.value) {
-            is KudzuLeaf<*> -> item.toJsonElement()
-            is KudzuVine -> item.toJsonObject()
-            else -> throw Exception("Something else shows in KudzuVine map when exporting!")
-        }
+        it.key to it.value.toJsonElement()
     }.toMap())
+}
+
+fun KudzuLattice.toJsonArray(): JsonArray {
+    return JsonArray(map { it.toJsonElement() })
 }
 
 fun KudzuLeaf<*>.toJsonElement(): JsonElement {

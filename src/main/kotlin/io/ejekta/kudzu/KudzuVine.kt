@@ -61,6 +61,14 @@ class KudzuVine(
         this[key] = KudzuLeaf.LeafNull
     }
 
+    fun leaf(key: String, value: KudzuItem) {
+        this[key] = value
+    }
+
+    fun lattice(key: String, func: KudzuLattice.() -> Unit = {}) {
+        this[key] = KudzuLattice().apply(func)
+    }
+
     fun trim(vararg index: String) = trim(index.toList())
 
     fun trim(index: List<String>): KudzuItem {
