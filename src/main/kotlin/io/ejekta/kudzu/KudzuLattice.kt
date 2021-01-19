@@ -15,5 +15,43 @@ class KudzuLattice(
         add(item.apply(func))
     }
 
+    fun prune(other: KudzuLattice): Boolean {
+        val commonIndices = (0 until size).intersect(0 until other.size)
+        val matchedItems = commonIndices
+            .map { it to this[it] }
+            .filter { it.first in commonIndices }
+
+        //retainAll()
+
+        val toRemove = mutableListOf<Int>()
+
+        for ((index, item) in matchedItems) {
+            when (item) {
+                is KudzuLeaf<*> -> {
+                    toRemove.add(index)
+                }
+                is KudzuVine -> {
+                    val otherVine = other[index].asVineOrNull() ?: continue
+                    val pruned = item.prune(otherVine)
+                    if (pruned) {
+                        toRemove.add(index)
+                    }
+                }
+                is KudzuLattice -> {
+                    val otherLattice = other[index].asLatticeOrNull() ?: continue
+                    val pruned = item.prune(otherLattice)
+                    if (pruned) {
+                        toRemove.add(index)
+                    }
+                }
+            }
+        }
+
+        for (i in toRemove.size - 1 downTo 0) {
+            removeAt(i)
+        }
+
+        return isEmpty()
+    }
 
 }

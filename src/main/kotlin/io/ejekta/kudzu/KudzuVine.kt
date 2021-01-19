@@ -1,5 +1,6 @@
 package io.ejekta.kudzu
 
+import kotlinx.serialization.KSerializer
 import java.lang.NullPointerException
 
 @KudzuMarker
@@ -15,10 +16,42 @@ class KudzuVine(
             it.key to when(val item = it.value) {
                 is KudzuVine -> item.clone()
                 is KudzuLeaf<*> -> item.clone()
+                is KudzuLattice -> TODO("Implement cloning of KudzuLattice")
                 else -> throw Exception("Cannot clone Kudzu item: $item")
             }
         }.toMap().toMutableMap()).apply(func)
         //return KudzuVine(content.toMutableMap()).apply(func)
+    }
+
+    // Returns true if the vine is now empty
+    fun prune(other: KudzuVine): Boolean {
+        val commonKeys = keys.intersect(other.keys)
+
+        // prune common keys
+        for ((key, item) in this.filter { it.key in commonKeys }) {
+            when (item) {
+                is KudzuLeaf<*> -> {
+                    val otherVal = other[key]!!.asLeaf()
+                    if (item.content == otherVal.content) {
+                        trim(key)
+                    }
+                }
+                is KudzuVine -> {
+                    val pruned = item.prune(other[key]!!.asVine())
+                    if (pruned) {
+                        trim(key)
+                    }
+                }
+                is KudzuLattice -> {
+                    val pruned = item.prune(other[key]!!.asLattice())
+                    if (pruned) {
+                        trim(key)
+                    }
+                }
+            }
+        }
+
+        return isEmpty()
     }
 
     override fun toString(): String {
@@ -164,5 +197,13 @@ class KudzuVine(
     fun growDouble(keys: List<String>): Double = growLeaf(keys)
     fun growDoubleOrNull(vararg keys: String): Double? = growDoubleOrNull(keys.toList())
     fun growDoubleOrNull(keys: List<String>): Double? = growLeafOrNull(keys)
+
+    fun <T> growListOf(serializer: KSerializer<T>, key: String): List<T> {
+        TODO("Implement growListOf")
+    }
+
+    fun <T> growMapOf(serializer: KSerializer<T>, key: String): Map<String, T> {
+        TODO("Implement growMapOf")
+    }
 
 }
