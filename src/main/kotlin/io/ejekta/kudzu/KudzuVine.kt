@@ -1,9 +1,11 @@
 package io.ejekta.kudzu
 
 import kotlinx.serialization.KSerializer
+import kotlinx.serialization.Serializable
 import java.lang.NullPointerException
 
 @KudzuMarker
+@Serializable(with = KudzuSerializer::class)
 class KudzuVine(
     val content: MutableMap<String, KudzuItem> = mutableMapOf()
 ) : KudzuItem, MutableMap<String, KudzuItem> by content {
